@@ -1,23 +1,36 @@
 import * as THREE from 'three';
+import WebGL from 'three/addons/capabilities/WebGL.js';
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+if (WebGL.isWebGL2Available()) {
+    
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(width, height);
+    document.body.appendChild(renderer.domElement);
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setAnimationLoop(animate);
-document.body.appendChild(renderer.domElement);
+    const camera = new THREE.PerspectiveCamera(45, width / height, 1, 500);
+    camera.position.set(0, 0, 100);
+    camera.lookAt(0, 0, 0);
 
-const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+    const scene = new THREE.Scene();
 
-camera.position.z = 5;
+    const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    
+    const points = [];
+    points.push(new THREE.Vector3(-10, 0, 0));
+    points.push(new THREE.Vector3(0, 10, 0));
+    points.push(new THREE.Vector3(10, 0, 0));
 
-function animate() {
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometry, material);
 
+    scene.add(line);
     renderer.render(scene, camera);
+    
+} else {
+    
+    const warning = WebGL.getWebGL2ErrorMessage();
+    document.getElementById('container').appendChild(warning);
+
 }
